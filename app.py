@@ -25,12 +25,12 @@ def convert_to_ascii(image_bytes, width=100):
     return "\n".join(lines)
 
 @app.post("/upload")
-async def upload(file: UploadFile = File(...)):
+async def upload(file: UploadFile = File(...), width: int = 100):
     if file.content_type not in ["image/jpeg", "image/png"]:
         return {"error": "Only JPG and PNG files allowed"}
     
     contents = await file.read()
-    ascii_art = convert_to_ascii(contents)
+    ascii_art = convert_to_ascii(contents, width)
     return {"ascii": ascii_art}
 
 templates = Jinja2Templates(directory="templates")
