@@ -87,6 +87,7 @@
         <button type="submit">Convert</button>
     </form>
     <div id="result"></div>
+    <p id="hint" style="color: #8b949e; margin-top: 10px;"></p>
     
     <div id="downloadOptions" class="download-options">
         <fieldset>
@@ -108,6 +109,16 @@
         const ASCII_CHARS = ['@', '#', 'S', '%', '?', '*', '+', ';', ':', ',', '.'];
         let currentAscii = '';
         let loadedImage = null;
+        let isSampleImage = true;
+
+        function updateHint() {
+            const hint = document.getElementById('hint');
+            if (isSampleImage) {
+                hint.textContent = "This is a sample — try changing the width above, or upload your own image!";
+            } else {
+                hint.textContent = "Tip: Adjust the width slider to resize your ASCII art";
+            }
+        }
         
         document.getElementById('widthSlider').addEventListener('input', (e) => {
             document.getElementById('widthValue').textContent = e.target.value;
@@ -121,6 +132,7 @@
             currentAscii = convertToAscii(loadedImage, width);
             document.getElementById('result').innerHTML = '<pre>' + currentAscii + '</pre>';
             document.getElementById('downloadOptions').classList.add('visible');
+            updateHint();
         }
         
         function convertToAscii(img, width) {
@@ -169,10 +181,11 @@
             loadImageFromFile(file);
         });
         
-        function loadImageFromFile(file) {
+        function loadImageFromFile(file, isSample = false) {
             const img = new Image();
             img.onload = () => {
                 loadedImage = img;
+                isSampleImage = isSample;
                 convertAndDisplay();
             };
             img.onerror = () => {
@@ -192,7 +205,7 @@
                 .then(blob => {
                     console.log('picture.png loaded, size:', blob.size);
                     const file = new File([blob], 'picture.png', { type: 'image/png' });
-                    loadImageFromFile(file);
+            loadImageFromFile(file, true);
                 })
                 .catch(err => {
                     console.log('No default picture to load:', err.message);
